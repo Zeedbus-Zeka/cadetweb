@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
+import * as XLSX from 'xlsx';
 import { supabase } from '@/src/lib/supabaseClient';
-import { ShieldCheck, FileText, Image as ImageIcon, Loader2 } from 'lucide-react';
+import { ShieldCheck, FileText, Image as ImageIcon, Loader2, Search, Download, ChevronLeft, ChevronRight } from 'lucide-react';
 
 // Theme colors
 const theme = {
@@ -19,6 +20,30 @@ export default function AdminDashboard() {
   const [members, setMembers] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const ITEMS_PER_PAGE = 20;
+
+  const filteredMembers = useMemo(() => {
+    if (!searchQuery.trim()) return members;
+    const q = searchQuery.toLowerCase().trim();
+    return members.filter(
+      (m) =>
+        (m.full_name?.toLowerCase().includes(q)) ||
+        (m.phone?.includes(q) || m.phone?.replace(/\s/g, '').includes(q))
+    );
+  }, [members, searchQuery]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredMembers.length / ITEMS_PER_PAGE));
+  const paginatedMembers = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredMembers.slice(start, start + ITEMS_PER_PAGE);
+  }, [filteredMembers, currentPage]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -75,6 +100,22 @@ export default function AdminDashboard() {
     });
   };
 
+  const handleExportExcel = () => {
+    const exportData = filteredMembers.map((m) => ({
+      'วันที่สมัคร': formatDate(m.created_at),
+      'ยศ/คำนำหน้า': m.rank || '-',
+      'ชื่อ-นามสกุล': m.full_name || '-',
+      'รุ่น': m.generation || '-',
+      'เบอร์โทรศัพท์': m.phone || '-',
+      'ลิงก์รูปภาพ': m.photo_url || '-',
+      'ลิงก์เอกสาร': m.document_url || '-'
+    }));
+    const ws = XLSX.utils.json_to_sheet(exportData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'สมาชิก');
+    XLSX.writeFile(wb, `members_${new Date().toISOString().slice(0, 10)}.xlsx`);
+  };
+
   return (
     <div className={`min-h-screen ${theme.primary} text-slate-100 font-sans p-6 selection:bg-amber-500 selection:text-slate-900`}>
       <div className="max-w-7xl mx-auto animate-in fade-in duration-700">
@@ -113,7 +154,7 @@ export default function AdminDashboard() {
           /* Dashboard Content */
           <>
             {/* Header */}
-            <div className="flex items-center justify-between mb-8 pb-6 border-b border-amber-500/30">
+            <div className="flex items-center justify-between mb-6 pb-6 border-b border-amber-500/30">
               <div className="flex items-center gap-4">
                 <div className="w-14 h-14 rounded-full border-2 border-amber-400 flex items-center justify-center bg-slate-800 shadow-[0_0_15px_rgba(251,191,36,0.3)]">
                   <ShieldCheck className="text-amber-400 w-8 h-8" />
@@ -123,12 +164,35 @@ export default function AdminDashboard() {
                   <p className="text-sm text-slate-300 tracking-widest mt-1">มูลนิธิศิษย์นายร้อย ตามรอยพระบาท</p>
                 </div>
               </div>
-              <button 
-                onClick={handleLogout}
-                className="px-4 py-2 text-sm border border-slate-600 text-slate-300 rounded-md hover:bg-slate-800 hover:text-amber-400 hover:border-amber-500/50 transition-all"
-              >
-                ออกจากระบบ
-              </button>
+              <div className="flex items-center gap-3">
+                <button 
+                  onClick={handleExportExcel}
+                  disabled={filteredMembers.length === 0}
+                  className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md bg-emerald-600 hover:bg-emerald-500 text-white border border-emerald-500/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                >
+                  <Download className="w-4 h-4" /> ดาวน์โหลด Excel
+                </button>
+                <button 
+                  onClick={handleLogout}
+                  className="px-4 py-2 text-sm border border-slate-600 text-slate-300 rounded-md hover:bg-slate-800 hover:text-amber-400 hover:border-amber-500/50 transition-all"
+                >
+                  ออกจากระบบ
+                </button>
+              </div>
+            </div>
+
+            {/* Search */}
+            <div className="mb-4">
+              <div className="relative max-w-md">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="ค้นหาตามชื่อ นามสกุล หรือเบอร์โทร..."
+                  className="w-full pl-10 pr-4 py-2.5 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all"
+                />
+              </div>
             </div>
 
             {/* Content Table */}
@@ -153,7 +217,19 @@ export default function AdminDashboard() {
                   <UsersIcon className="w-16 h-16 mx-auto mb-4 opacity-50" />
                   <p className="text-lg">ยังไม่มีข้อมูลสมาชิกในระบบ</p>
                 </div>
+              ) : filteredMembers.length === 0 ? (
+                <div className="text-center py-32 text-slate-400">
+                  <Search className="w-16 h-16 mx-auto mb-4 opacity-50" />
+                  <p className="text-lg">ไม่พบผลลัพธ์จากการค้นหา</p>
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className="mt-4 text-amber-400 hover:text-amber-300 text-sm underline"
+                  >
+                    ล้างการค้นหา
+                  </button>
+                </div>
               ) : (
+                <>
                 <table className="w-full text-left border-collapse min-w-[900px]">
                   <thead>
                     <tr className="border-b-2 border-amber-500/50 text-amber-500/80 text-sm tracking-wide">
@@ -166,7 +242,7 @@ export default function AdminDashboard() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-700/50">
-                    {members.map((member, index) => (
+                    {paginatedMembers.map((member, index) => (
                       <tr key={member.id || index} className="hover:bg-slate-700/30 transition-colors">
                         <td className="py-4 px-4 text-slate-300 text-sm whitespace-nowrap">{formatDate(member.created_at)}</td>
                         <td className="py-4 px-4 whitespace-nowrap">{member.rank || '-'}</td>
@@ -208,6 +284,33 @@ export default function AdminDashboard() {
                     ))}
                   </tbody>
                 </table>
+
+                {/* Pagination */}
+                <div className="flex items-center justify-between mt-6 pt-6 border-t border-slate-700/50">
+                  <p className="text-sm text-slate-400">
+                    แสดง {(currentPage - 1) * ITEMS_PER_PAGE + 1}–{Math.min(currentPage * ITEMS_PER_PAGE, filteredMembers.length)} จากทั้งหมด {filteredMembers.length} คน
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                      disabled={currentPage === 1}
+                      className="flex items-center gap-1 px-3 py-2 text-sm rounded-md border border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-amber-400 hover:border-amber-500/50 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                    >
+                      <ChevronLeft className="w-4 h-4" /> หน้าก่อนหน้า
+                    </button>
+                    <span className="px-4 py-2 text-sm text-amber-400 font-medium bg-slate-800 rounded-md border border-amber-500/30">
+                      หน้า {currentPage} / {totalPages}
+                    </span>
+                    <button
+                      onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                      disabled={currentPage === totalPages}
+                      className="flex items-center gap-1 px-3 py-2 text-sm rounded-md border border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-amber-400 hover:border-amber-500/50 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                    >
+                      หน้าถัดไป <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+                </>
               )}
             </div>
           </>
