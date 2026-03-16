@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Camera, UploadCloud, Users, BookOpen, ChevronRight, ShieldCheck } from 'lucide-react';
+import { Camera, UploadCloud, Users, BookOpen, ChevronRight, ShieldCheck, KeyRound } from 'lucide-react';
 import { supabase } from '@/src/lib/supabaseClient';
 
 export default function Home() {
@@ -53,6 +53,16 @@ export default function Home() {
         <h2 className="text-lg font-semibold text-amber-400 mb-2">มูลนิธิศิษย์นายร้อย ตามรอยพระบาท</h2>
         <p className="text-sm text-slate-500">เกียรติยศ วินัย กล้าหาญ</p>
         <p className="text-xs text-slate-600 mt-8">© 2026 Foundation System. All rights reserved.</p>
+
+        {/* Admin hint link */}
+        <button
+          type="button"
+          onClick={() => { window.location.href = '/admin'; }}
+          className="mt-4 mx-auto flex items-center justify-center gap-2 text-[11px] text-slate-500/70 hover:text-slate-300 transition-colors"
+        >
+          <KeyRound className="w-3 h-3" />
+          <span>สำหรับเจ้าหน้าที่ (Admin)</span>
+        </button>
       </footer>
     </div>
   );

@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import * as XLSX from 'xlsx';
 import { supabase } from '@/src/lib/supabaseClient';
-import { ShieldCheck, FileText, Image as ImageIcon, Loader2, Search, Download, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ShieldCheck, FileText, Image as ImageIcon, Loader2, Search, Download, ChevronLeft, ChevronRight, KeyRound } from 'lucide-react';
 
 // Theme colors
 const theme = {
@@ -117,12 +117,12 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className={`min-h-screen ${theme.primary} text-slate-100 font-sans p-6 selection:bg-amber-500 selection:text-slate-900`}>
-      <div className="max-w-7xl mx-auto animate-in fade-in duration-700">
+    <div className={`min-h-screen ${theme.primary} text-slate-100 font-sans p-6 selection:bg-amber-500 selection:text-slate-900 flex flex-col`}>
+      <div className="max-w-7xl mx-auto animate-in fade-in duration-700 flex-1 w-full">
         
         {!isAuthenticated ? (
           /* Login Screen */
-          <div className="flex items-center justify-center min-h-[80vh]">
+          <div className="flex flex-col items-center justify-center min-h-[80vh] gap-6">
             <div className="bg-slate-800/50 border border-amber-500/30 rounded-xl p-8 shadow-2xl backdrop-blur-sm max-w-md w-full text-center">
               <div className="w-16 h-16 mx-auto mb-6 rounded-full border-2 border-amber-400 flex items-center justify-center bg-slate-900 shadow-[0_0_15px_rgba(251,191,36,0.3)]">
                 <ShieldCheck className="text-amber-400 w-8 h-8" />
@@ -149,6 +149,15 @@ export default function AdminDashboard() {
                 </button>
               </form>
             </div>
+
+            {/* Back to main dashboard */}
+            <button
+              type="button"
+              onClick={() => { window.location.href = '/'; }}
+              className="text-xs text-slate-500/80 hover:text-amber-300 transition-colors underline-offset-4 hover:underline"
+            >
+              หน้าหลัก
+            </button>
           </div>
         ) : (
           /* Dashboard Content */
@@ -315,6 +324,12 @@ export default function AdminDashboard() {
             </div>
           </>
         )}
+      </div>
+
+      {/* Admin hint footer */}
+      <div className="mt-6 text-center text-xs text-slate-500/70 flex items-center justify-center gap-2">
+        <KeyRound className="w-3 h-3" />
+        <span>สำหรับเจ้าหน้าที่ (Admin)</span>
       </div>
     </div>
   );
