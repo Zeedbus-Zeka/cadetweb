@@ -1,7 +1,9 @@
 "use client";
 
 import React, { useState } from 'react';
+import Image from 'next/image';
 import { Camera, UploadCloud, Users, BookOpen, ChevronRight, ShieldCheck, KeyRound } from 'lucide-react';
+import { supabase } from '@/src/lib/supabaseClient';
 
 export default function Page() {
   const [activeTab, setActiveTab] = useState('home');
@@ -21,8 +23,14 @@ export default function Page() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-20 items-center">
             <div className="flex items-center gap-3 cursor-pointer" onClick={() => setActiveTab('home')}>
-              <div className="w-12 h-12 rounded-full border-2 border-amber-400 flex items-center justify-center bg-slate-800 shadow-[0_0_15px_rgba(251,191,36,0.3)]">
-                <ShieldCheck className="text-amber-400 w-7 h-7" />
+              <div className="w-12 h-12 rounded-full border-2 border-amber-400 flex items-center justify-center bg-slate-800 overflow-hidden shadow-[0_0_15px_rgba(251,191,36,0.3)]">
+                <Image
+                  src="/my-logo-minimal.png"
+                  alt="Cadet Foundation Logo"
+                  width={40}
+                  height={40}
+                  className="object-contain"
+                />
               </div>
               <div>
                 <h1 className="text-xl font-bold tracking-wider text-amber-400">มูลนิธิศิษย์นายร้อย</h1>
@@ -48,7 +56,15 @@ export default function Page() {
 
       {/* Footer */}
       <footer className="border-t border-amber-500/20 bg-slate-950 py-12 text-center mt-20">
-        <ShieldCheck className="text-amber-500/50 w-12 h-12 mx-auto mb-4" />
+        <div className="w-14 h-14 mx-auto mb-4 rounded-full border-2 border-amber-400 flex items-center justify-center bg-slate-900 overflow-hidden shadow-[0_0_20px_rgba(251,191,36,0.4)]">
+          <Image
+            src="/my-logo-minimal.png"
+            alt="Cadet Foundation Logo"
+            width={44}
+            height={44}
+            className="object-contain"
+          />
+        </div>
         <h2 className="text-lg font-semibold text-amber-400 mb-2">มูลนิธิศิษย์นายร้อย ตามรอยพระบาท</h2>
         <p className="text-sm text-slate-500">เกียรติยศ วินัย กล้าหาญ</p>
         <p className="text-xs text-slate-600 mt-8">© 2026 Foundation System. All rights reserved.</p>
@@ -85,7 +101,15 @@ function HomeView({ theme, setActiveTab }: any) {
         </div>
         
         <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
-          <ShieldCheck className="w-24 h-24 text-amber-400 mx-auto mb-8 drop-shadow-[0_0_15px_rgba(251,191,36,0.8)]" />
+          <div className="w-24 h-24 mx-auto mb-8 rounded-full border-4 border-amber-400 bg-slate-900/70 flex items-center justify-center shadow-[0_0_40px_rgba(251,191,36,0.9)] overflow-hidden">
+            <Image
+              src="/my-logo-minimal.png"
+              alt="Cadet Foundation Logo"
+              width={80}
+              height={80}
+              className="object-contain"
+            />
+          </div>
           <h1 className="text-4xl md:text-7xl font-extrabold text-white mb-6 leading-tight drop-shadow-lg">
             สืบสานปณิธาน <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-amber-200">

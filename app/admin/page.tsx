@@ -1,9 +1,10 @@
 "use client";
 
 import React, { useEffect, useState, useMemo } from 'react';
+import Image from 'next/image';
 import * as XLSX from 'xlsx';
 import { supabase } from '@/src/lib/supabaseClient';
-import { ShieldCheck, FileText, Image as ImageIcon, Loader2, Search, Download, ChevronLeft, ChevronRight, KeyRound } from 'lucide-react';
+import { FileText, Image as ImageIcon, Loader2, Search, Download, ChevronLeft, ChevronRight, KeyRound } from 'lucide-react';
 
 // Theme colors
 const theme = {
@@ -124,8 +125,14 @@ export default function AdminDashboard() {
           /* Login Screen */
           <div className="flex flex-col items-center justify-center min-h-[80vh] gap-6">
             <div className="bg-slate-800/50 border border-amber-500/30 rounded-xl p-8 shadow-2xl backdrop-blur-sm max-w-md w-full text-center">
-              <div className="w-16 h-16 mx-auto mb-6 rounded-full border-2 border-amber-400 flex items-center justify-center bg-slate-900 shadow-[0_0_15px_rgba(251,191,36,0.3)]">
-                <ShieldCheck className="text-amber-400 w-8 h-8" />
+              <div className="w-16 h-16 mx-auto mb-6 rounded-full border-2 border-amber-400 flex items-center justify-center bg-slate-900 shadow-[0_0_15px_rgba(251,191,36,0.3)] overflow-hidden">
+                <Image
+                  src="/my-logo-minimal.png"
+                  alt="Admin Logo"
+                  width={40}
+                  height={40}
+                  className="object-contain"
+                />
               </div>
               <h2 className="text-2xl font-bold text-amber-400 mb-2">ระบบจัดการหลังบ้าน</h2>
               <p className="text-slate-400 mb-8 text-sm">กรุณาใส่รหัสผ่านเพื่อเข้าสู่ระบบ</p>
@@ -165,8 +172,14 @@ export default function AdminDashboard() {
             {/* Header */}
             <div className="flex items-center justify-between mb-6 pb-6 border-b border-amber-500/30">
               <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-full border-2 border-amber-400 flex items-center justify-center bg-slate-800 shadow-[0_0_15px_rgba(251,191,36,0.3)]">
-                  <ShieldCheck className="text-amber-400 w-8 h-8" />
+                <div className="w-14 h-14 rounded-full border-2 border-amber-400 flex items-center justify-center bg-slate-800 shadow-[0_0_15px_rgba(251,191,36,0.3)] overflow-hidden">
+                  <Image
+                    src="/my-logo-minimal.png"
+                    alt="Admin Logo"
+                    width={48}
+                    height={48}
+                    className="object-contain"
+                  />
                 </div>
                 <div>
                   <h1 className="text-3xl font-bold tracking-wider text-amber-400">ระบบจัดการหลังบ้าน</h1>
